@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יומן דוחות - נוהל בדיקות Off Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#1f9ed6;--brand-dark:#157fb8;--accent:#f7a81e;--ink:#1c2a33;--ink-soft:#5c6b76;
+    --line:#dfe8ef;--bg:#f2f7fb;--card:#fff;--soft-bg:#e7f4fb;
+    --ok:#1f8a4c;--ok-bg:#e7f6ec;--bad:#c23b3b;--bad-bg:#fbeaea;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);
+    font-family:'Rubik',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.45;padding-bottom:100px;}
+  .brandbar{background:#fff;padding:16px 16px 14px;border-bottom:3px solid var(--accent);}
+  .brandbar-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:13px;}
+  .brand .txt{display:flex;flex-direction:column;line-height:1;}
+  .brand .name{font-size:34px;font-weight:900;color:var(--brand);letter-spacing:-.5px;}
+  .brand .tag{font-size:13.5px;font-weight:500;color:#45bfe8;margin-top:5px;}
+  .back-link{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;
+    background:var(--soft-bg);padding:8px 14px;border-radius:20px;white-space:nowrap;}
+  header{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;padding:18px 16px;}
+  header h1{margin:0 0 4px;font-size:19px;font-weight:700;}
+  header p{margin:0;font-size:13px;opacity:.9;}
+  .wrap{max-width:760px;margin:0 auto;padding:14px 12px 0;}
+  .card{background:var(--card);border-radius:14px;box-shadow:0 1px 3px rgba(20,40,55,.06);
+    margin-bottom:12px;overflow:hidden;border:1px solid var(--line);}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;gap:10px;flex-wrap:wrap;}
+  .toolbar .left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);}
+  .toolbar .right{display:flex;gap:8px;}
+  button{font-family:inherit;cursor:pointer;}
+  .btn{padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    font-size:13px;font-weight:700;color:var(--ink);}
+  .btn.refresh{color:var(--brand-dark);border-color:var(--brand);}
+  .btn.delete{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .btn.delete:disabled{opacity:.45;cursor:not-allowed;}
+  .status-msg{padding:10px 14px;font-size:13px;}
+  .status-msg.err{color:var(--bad);background:var(--bad-bg);}
+  .status-msg.ok{color:var(--ok);background:var(--ok-bg);}
+  .status-msg.info{color:var(--ink-soft);}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:var(--soft-bg);color:var(--brand-dark);font-weight:700;text-align:right;
+    padding:9px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;}
+  tbody td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.selected{background:#eef8fd;}
+  td.chk, th.chk{width:34px;text-align:center;}
+  td.chk input, th.chk input{width:17px;height:17px;}
+  .verdict-pass{color:var(--ok);font-weight:700;}
+  .verdict-fail{color:var(--bad);font-weight:700;}
+  .empty-state{padding:34px 16px;text-align:center;color:var(--ink-soft);font-size:14px;}
+  .empty-state .big{font-size:34px;margin-bottom:8px;}
+  .config-warn{background:var(--bad-bg);border:1px solid #e6b3b3;color:#a03030;border-radius:10px;
+    padding:12px 14px;font-size:13px;margin:14px 0;}
+  code{background:#eef4f8;color:#0b4a68;padding:1px 6px;border-radius:5px;font-family:Consolas,Menlo,monospace;font-size:12px;}
+  .confirm-bar{display:none;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--bad-bg);border:1px solid #e6b3b3;border-radius:10px;padding:10px 14px;margin:0 12px 12px;font-size:13px;color:#a03030;}
+  .confirm-bar b{white-space:nowrap;}
+  .confirm-actions{display:flex;gap:8px;}
+  .confirm-actions button{padding:7px 12px;border-radius:8px;border:none;font-size:12.5px;font-weight:700;}
+  .confirm-yes{background:var(--bad);color:#fff;}
+  .confirm-no{background:#fff;border:1px solid var(--line) !important;color:var(--ink);}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid #cfe6f3;border-top-color:var(--brand);
+    border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brandbar-inner">
+    <div class="brand">
+      <svg width="70" height="70" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="מאורות">
+        <path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>
+        <path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>
+        <path d="M70 54 L104 22" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round"/>
+        <path d="M88 20 L106 20 L106 38" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 74 L54 60 L64 68 L82 44" stroke="#1f9ed6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 82 L74 82" stroke="#f7a81e" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <div class="txt">
+        <span class="name">מאורות</span>
+        <span class="tag">כל האנרגיה בשבילך</span>
+      </div>
+    </div>
+    <a href="off_grid_pv_form.html" class="back-link">↩ חזרה לטופס</a>
+  </div>
+</div>
+<header>
+  <div class="wrap" style="padding:0;">
+    <h1>יומן דוחות בדיקה - Off Grid</h1>
+    <p>כל דוח שנשלח דרך הטופס מתועד כאן. ניתן לסמן דוחות ולמחוק אותם.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="config-warning" class="config-warn" style="display:none;">
+    יומן הדוחות עדיין לא חובר. יש להשלים את הקמת ה-Webhooks ולעדכן את הכתובות
+    <code>LIST_WEBHOOK_URL</code> ו-<code>DELETE_WEBHOOK_URL</code> בראש קובץ זה.
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="left" id="count-label">טוען...</div>
+      <div class="right">
+        <button type="button" class="btn refresh" id="btn-refresh">⟳ רענן</button>
+        <button type="button" class="btn delete" id="btn-delete" disabled>🗑 מחק נבחרים</button>
+      </div>
+    </div>
+    <div id="status-msg"></div>
+    <div id="confirm-bar" class="confirm-bar">
+      <span>למחוק <b id="confirm-count">0</b> דוחות לצמיתות? הפעולה אינה הפיכה.</span>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-yes" id="confirm-yes">כן, מחק</button>
+        <button type="button" class="confirm-no" id="confirm-no">ביטול</button>
+      </div>
+    </div>
+    <div id="table-wrap" style="overflow-x:auto;"></div>
+  </div>
+
+</div>
+
+<script>
+// ==== כתובות ה-Webhooks של יומן הדוחות (Power Automate) ====
+// יש למלא אותן לאחר הקמת שני ה-Flows הנוספים (ראה מדריך ההקמה).
+// כל עוד ריקות - העמוד מציג אזהרת קונפיגורציה במקום רשימה.
+const LIST_WEBHOOK_URL = '';
+const DELETE_WEBHOOK_URL = '';
+
+const tableWrap = document.getElementById('table-wrap');
+const countLabel = document.getElementById('count-label');
+const statusMsg = document.getElementById('status-msg');
+const btnDelete = document.getElementById('btn-delete');
+const btnRefresh = document.getElementById('btn-refresh');
+const confirmBar = document.getElementById('confirm-bar');
+const confirmCount = document.getElementById('confirm-count');
+
+let rows = [];
+let selected = new Set();
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function setStatus(text, type){
+  statusMsg.className = 'status-msg' + (type ? ' ' + type : '');
+  statusMsg.textContent = text || '';
+}
+
+function renderTable(){
+  if(!rows.length){
+    tableWrap.innerHTML = '<div class="empty-state"><div class="big">📭</div>עדיין לא נשלחו דוחות, או שהרשימה ריקה.</div>';
+    countLabel.textContent = '0 דוחות';
+    btnDelete.disabled = true;
+    return;
+  }
+  countLabel.textContent = rows.length + ' דוחות' + (selected.size ? ' · ' + selected.size + ' נבחרו' : '');
+  btnDelete.disabled = selected.size === 0;
+
+  let html = '<table><thead><tr>' +
+    '<th class="chk"><input type="checkbox" id="chk-all"></th>' +
+    '<th>תאריך</th><th>פרויקט</th><th>בודק</th><th>מסקנה</th><th>קובץ</th>' +
+    '</tr></thead><tbody>';
+  rows.forEach(r => {
+    const isSel = selected.has(r.id);
+    const verdictClass = /עבר|✔/.test(r.verdict || '') ? 'verdict-pass' : (/נדרש|✖/.test(r.verdict||'') ? 'verdict-fail' : '');
+    html += `<tr class="${isSel?'selected':''}" data-id="${esc(r.id)}">` +
+      `<td class="chk"><input type="checkbox" class="row-chk" data-id="${esc(r.id)}" ${isSel?'checked':''}></td>` +
+      `<td>${esc(r.date)}</td>` +
+      `<td>${esc(r.project)}</td>` +
+      `<td>${esc(r.inspector)}</td>` +
+      `<td class="${verdictClass}">${esc(r.verdict)}</td>` +
+      `<td>${esc(r.fileName)}</td>` +
+      `</tr>`;
+  });
+  html += '</tbody></table>';
+  tableWrap.innerHTML = html;
+
+  document.getElementById('chk-all').checked = selected.size === rows.length;
+  document.getElementById('chk-all').addEventListener('change', function(){
+    if(this.checked){ rows.forEach(r => selected.add(r.id)); }
+    else { selected.clear(); }
+    renderTable();
+  });
+  tableWrap.querySelectorAll('.row-chk').forEach(cb => {
+    cb.addEventListener('change', function(){
+      const id = this.getAttribute('data-id');
+      if(this.checked) selected.add(id); else selected.delete(id);
+      renderTable();
+    });
+  });
+}
+
+async function loadReports(preserveStatus){
+  if(!LIST_WEBHOOK_URL){
+    document.getElementById('config-warning').style.display = 'block';
+    countLabel.textContent = '';
+    tableWrap.innerHTML = '';
+    return;
+  }
+  document.getElementById('config-warning').style.display = 'none';
+  if(!preserveStatus) setStatus('טוען יומן דוחות...', 'info');
+  btnRefresh.disabled = true;
+  try {
+    const res = await fetch(LIST_WEBHOOK_URL, { method: 'GET' });
+    if(!res.ok) throw new Error('שגיאת שרת: ' + res.status);
+    const data = await res.json();
+    rows = (Array.isArray(data) ? data : (data.value || [])).map(r => ({
+      id: r.id ?? r['מזהה'] ?? '',
+      date: r.date ?? r['תאריך'] ?? '',
+      project: r.project ?? r['פרויקט'] ?? '',
+      inspector: r.inspector ?? r['בודק'] ?? '',
+      verdict: r.verdict ?? r['מסקנה'] ?? '',
+      fileName: r.fileName ?? r['קובץ'] ?? '',
+      fileId: r.fileId ?? r['FileId'] ?? ''
+    })).sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+    selected.clear();
+    if(!preserveStatus) setStatus('', '');
+    renderTable();
+  } catch(e){
+    setStatus('שגיאה בטעינת היומן: ' + (e.message || e) + '. ודא שכתובת LIST_WEBHOOK_URL תקינה והזרימה פעילה.', 'err');
+    tableWrap.innerHTML = '';
+    countLabel.textContent = '';
+  } finally {
+    btnRefresh.disabled = false;
+  }
+}
+
+btnRefresh.addEventListener('click', loadReports);
+
+btnDelete.addEventListener('click', () => {
+  if(!selected.size) return;
+  confirmCount.textContent = selected.size;
+  confirmBar.style.display = 'flex';
+});
+
+document.getElementById('confirm-no').addEventListener('click', () => {
+  confirmBar.style.display = 'none';
+});
+
+document.getElementById('confirm-yes').addEventListener('click', async () => {
+  confirmBar.style.display = 'none';
+  if(!DELETE_WEBHOOK_URL){
+    setStatus('כתובת DELETE_WEBHOOK_URL אינה מוגדרת - לא ניתן למחוק.', 'err');
+    return;
+  }
+  const idsToDelete = rows.filter(r => selected.has(r.id));
+  setStatus('מוחק ' + idsToDelete.length + ' דוחות...', 'info');
+  btnDelete.disabled = true;
+  let failCount = 0;
+  for(const r of idsToDelete){
+    try {
+      const url = DELETE_WEBHOOK_URL + '?id=' + encodeURIComponent(r.id) + '&fileId=' + encodeURIComponent(r.fileId || '');
+      const res = await fetch(url, { method: 'GET' });
+      if(!res.ok) throw new Error('status ' + res.status);
+    } catch(e){
+      failCount++;
+    }
+  }
+  if(failCount){
+    setStatus('נמחקו ' + (idsToDelete.length - failCount) + ' מתוך ' + idsToDelete.length + ' - היו כשלים. רענן ונסה שוב על השאר.', 'err');
+  } else {
+    setStatus('✔ ' + idsToDelete.length + ' דוחות נמחקו בהצלחה.', 'ok');
+  }
+  await loadReports(true);
+});
+
+loadReports();
+</script>
+</body>
+</html>

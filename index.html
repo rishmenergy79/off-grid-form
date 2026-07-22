@@ -24,10 +24,14 @@
 
   /* לוגו מאורות */
   .brandbar{background:#fff;padding:16px 16px 14px;border-bottom:3px solid var(--accent);}
-  .brand{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:13px;}
+  .brandbar-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:13px;}
   .brand .txt{display:flex;flex-direction:column;line-height:1;}
   .brand .name{font-size:34px;font-weight:900;color:var(--brand);letter-spacing:-.5px;}
   .brand .tag{font-size:13.5px;font-weight:500;color:#45bfe8;margin-top:5px;}
+  .log-link{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;
+    background:var(--soft-bg,#e7f4fb);padding:8px 14px;border-radius:20px;white-space:nowrap;}
+  .log-link:active{opacity:.8;}
 
   header{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;padding:18px 16px 18px;}
   header h1{margin:0 0 4px;font-size:19px;font-weight:700;}
@@ -202,19 +206,22 @@
 <body>
 
 <div class="brandbar">
-  <div class="brand">
-    <svg width="70" height="70" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="מאורות">
-      <path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>
-      <path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>
-      <path d="M70 54 L104 22" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round"/>
-      <path d="M88 20 L106 20 L106 38" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <path d="M42 74 L54 60 L64 68 L82 44" stroke="#1f9ed6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <path d="M42 82 L74 82" stroke="#f7a81e" stroke-width="7" stroke-linecap="round"/>
-    </svg>
-    <div class="txt">
-      <span class="name">מאורות</span>
-      <span class="tag">כל האנרגיה בשבילך</span>
+  <div class="brandbar-inner">
+    <div class="brand">
+      <svg width="70" height="70" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="מאורות">
+        <path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>
+        <path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>
+        <path d="M70 54 L104 22" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round"/>
+        <path d="M88 20 L106 20 L106 38" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 74 L54 60 L64 68 L82 44" stroke="#1f9ed6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 82 L74 82" stroke="#f7a81e" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <div class="txt">
+        <span class="name">מאורות</span>
+        <span class="tag">כל האנרגיה בשבילך</span>
+      </div>
     </div>
+    <a href="reports_log.html" class="log-link" target="_blank" rel="noopener">📋 יומן דוחות</a>
   </div>
 </div>
 <header>
@@ -237,12 +244,9 @@
     </div>
     <!-- מיקום Waze -->
     <div class="loc-block">
-      <button type="button" id="btn-location-photo" class="loc-btn loc-btn-primary">📷 צלם תמונה של מיקום הפרויקט (חובה)</button>
-      <input type="file" id="loc-photo-input" accept="image/*" capture="environment" style="display:none">
+      <button type="button" id="btn-location-secure" class="loc-btn loc-btn-primary">📍 תפוס מיקום נוכחי (חובה)</button>
       <div id="loc-result" class="loc-result"></div>
       <div class="loc-alt">
-        <button type="button" id="btn-location" class="loc-btn-text">נסה איתור מיקום אוטומטי של הדפדפן</button>
-        <span class="loc-alt-sep">·</span>
         <button type="button" id="btn-location-manual-toggle" class="loc-btn-text">הדבקת קישור ידנית</button>
       </div>
       <div class="loc-manual" id="loc-manual-box" style="display:none;">
@@ -322,7 +326,7 @@
     <div class="email-block">
       <div class="recipients">
         <span class="rlabel">הדוח יישלח אל:</span>
-        <span class="rlist">pv@menergy.co.il (מצב בדיקה)</span>
+        <span class="rlist">dror@menergy.co.il, eng@menergy.co.il, Tiful@menergy.co.il</span>
       </div>
       <button type="button" id="btn-send-email" class="email-send-btn">✉ שליחת הדוח</button>
       <div class="email-hint">לאחר חיבור השירות (Power Automate): לחיצה אחת שולחת אוטומטית PDF לשלושת הנמענים. עד אז — לחיצה מעתיקה את הדוח ופותחת מייל מוכן.</div>
@@ -689,61 +693,7 @@ document.querySelectorAll('.toggle-row').forEach(row => {
 
 // ===== מיקום Waze =====
 let savedLocation = null; // {lat, lon, wazeUrl}
-const locBtn = document.getElementById('btn-location');
 const locResult = document.getElementById('loc-result');
-
-// קורא תג מיקום GPS מתוך קובץ JPEG (EXIF) - עוקף לגמרי את חסימת מיקום הדפדפן בקבצים מקומיים,
-// כי כאן אנחנו רק קוראים בייטים מקובץ (File API), לא קוראים ל-navigator.geolocation.
-function getExifGPS(buffer) {
-  const view = new DataView(buffer);
-  if (view.getUint16(0, false) !== 0xFFD8) return null; // לא JPEG
-  let offset = 2;
-  const length = view.byteLength;
-  while (offset < length - 1) {
-    const marker = view.getUint16(offset, false);
-    if ((marker & 0xFF00) !== 0xFF00) break;
-    if (marker === 0xFFD8) { offset += 2; continue; }
-    if (marker === 0xFFD9 || marker === 0xFFDA) break;
-    const size = view.getUint16(offset + 2, false);
-    if (marker !== 0xFFE1) { offset += 2 + size; continue; }
-    const exifStart = offset + 4;
-    if (view.getUint32(exifStart, false) !== 0x45786966) { offset += 2 + size; continue; }
-    const tiffOffset = exifStart + 6;
-    const little = view.getUint16(tiffOffset, false) === 0x4949;
-    const firstIFDOffset = view.getUint32(tiffOffset + 4, little);
-    const ifd0Offset = tiffOffset + firstIFDOffset;
-    const entries = view.getUint16(ifd0Offset, little);
-    let gpsIFDOffset = null;
-    for (let i = 0; i < entries; i++) {
-      const entryOffset = ifd0Offset + 2 + i * 12;
-      if (view.getUint16(entryOffset, little) === 0x8825) {
-        gpsIFDOffset = tiffOffset + view.getUint32(entryOffset + 8, little);
-        break;
-      }
-    }
-    if (gpsIFDOffset === null) return null;
-    const gEntries = view.getUint16(gpsIFDOffset, little);
-    let latRef, lonRef, lat, lon;
-    const readRational = off => { const n = view.getUint32(off, little), d = view.getUint32(off+4, little); return d ? n/d : 0; };
-    const readCoord = entryOffset => {
-      const abs = tiffOffset + view.getUint32(entryOffset + 8, little);
-      return readRational(abs) + readRational(abs+8)/60 + readRational(abs+16)/3600;
-    };
-    for (let i = 0; i < gEntries; i++) {
-      const entryOffset = gpsIFDOffset + 2 + i * 12;
-      const tag = view.getUint16(entryOffset, little);
-      if (tag === 1) latRef = String.fromCharCode(view.getUint8(entryOffset + 8));
-      else if (tag === 2) lat = readCoord(entryOffset);
-      else if (tag === 3) lonRef = String.fromCharCode(view.getUint8(entryOffset + 8));
-      else if (tag === 4) lon = readCoord(entryOffset);
-    }
-    if (lat === undefined || lon === undefined) return null;
-    if (latRef === 'S') lat = -lat;
-    if (lonRef === 'W') lon = -lon;
-    return { lat, lon };
-  }
-  return null;
-}
 
 function showSavedLocation(lat, lon, sourceLabel){
   const wazeUrl = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
@@ -759,56 +709,36 @@ function showSavedLocation(lat, lon, sourceLabel){
   document.getElementById('waze-url-box').addEventListener('click', function(){ this.select(); });
 }
 
-const photoLocBtn = document.getElementById('btn-location-photo');
-const photoLocInput = document.getElementById('loc-photo-input');
-photoLocBtn.addEventListener('click', () => photoLocInput.click());
-photoLocInput.addEventListener('change', () => {
-  const file = photoLocInput.files[0];
-  photoLocInput.value = '';
-  if(!file) return;
-  photoLocBtn.textContent = '⌛ קורא מיקום מהתמונה...';
-  const reader = new FileReader();
-  reader.onload = () => {
-    const gps = getExifGPS(reader.result);
-    photoLocBtn.textContent = '📷 צלם תמונה של מיקום הפרויקט (חובה)';
-    if(gps){
-      showSavedLocation(gps.lat, gps.lon, 'מתמונה');
-      photoLocBtn.classList.add('captured');
-      showToast('מיקום נקרא מהתמונה בהצלחה');
-    } else {
-      locResult.innerHTML = '<div class="err">לא נמצא תג מיקום בתמונה. ודא ששירותי המיקום פעילים באפליקציית המצלמה (הגדרות מצלמה ← מיקום), ונסה שוב. לחלופין השתמש באפשרויות למטה.</div>';
-    }
-  };
-  reader.onerror = () => {
-    photoLocBtn.textContent = '📷 צלם תמונה של מיקום הפרויקט (חובה)';
-    showToast('שגיאה בקריאת התמונה');
-  };
-  reader.readAsArrayBuffer(file);
-});
-
 document.getElementById('btn-location-manual-toggle').addEventListener('click', () => {
   const box = document.getElementById('loc-manual-box');
   box.style.display = box.style.display === 'none' ? 'block' : 'none';
 });
-locBtn.addEventListener('click', () => {
+
+function requestAutoLocation(btn, resetLabel){
   if(!navigator.geolocation){
-    locResult.innerHTML = '<div class="err">הדפדפן אינו תומך באיתור מיקום.</div>';
+    locResult.innerHTML = '<div class="err">הדפדפן אינו תומך באיתור מיקום. השתמש בהדבקת קישור ידנית למטה.</div>';
     return;
   }
-  locBtn.textContent = '⌛ מאתר מיקום...';
+  const orig = btn.textContent;
+  btn.textContent = '⌛ מאתר מיקום...';
   navigator.geolocation.getCurrentPosition(pos => {
-    locBtn.textContent = 'נסה איתור מיקום אוטומטי של הדפדפן';
-    showSavedLocation(pos.coords.latitude.toFixed(6), pos.coords.longitude.toFixed(6), 'GPS דפדפן');
+    btn.textContent = resetLabel || orig;
+    btn.classList.add('captured');
+    showSavedLocation(pos.coords.latitude.toFixed(6), pos.coords.longitude.toFixed(6), 'GPS');
     showToast('מיקום נשמר');
   }, err => {
-    locBtn.textContent = 'נסה איתור מיקום אוטומטי של הדפדפן';
-    let msg = 'לא ניתן היה לאתר מיקום אוטומטית (מקובל בקבצים מקומיים) - השתמש בצילום תמונה למעלה, או בהדבקה ידנית.';
-    if(err.code === 3) msg = 'איתור המיקום ארך זמן רב מדי - נסה שוב.';
+    btn.textContent = resetLabel || orig;
+    let msg = 'לא ניתן היה לאתר מיקום אוטומטית - נא לאשר הרשאת מיקום לדפדפן, ולנסות שוב. לחלופין השתמש בהדבקת קישור ידנית למטה.';
+    if(err.code === 1) msg = 'הגישה למיקום נדחתה. יש לאשר הרשאת מיקום לדפדפן בהגדרות הטלפון ולנסות שוב, או להשתמש בהדבקת קישור ידנית למטה.';
+    if(err.code === 3) msg = 'איתור המיקום ארך זמן רב מדי - נסה שוב, רצוי בשטח פתוח.';
     locResult.innerHTML = `<div class="err">${msg}</div>`;
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-});
+}
 
-// שמירת מיקום ידנית - הדבקת קישור/קואורדינטות שהועתקו מהאפליקציה (עוקף מגבלת מיקום בקבצים מקומיים)
+const secureLocBtn = document.getElementById('btn-location-secure');
+secureLocBtn.addEventListener('click', () => requestAutoLocation(secureLocBtn, '📍 תפוס מיקום נוכחי (חובה)'));
+
+// שמירת מיקום ידנית - הדבקת קישור/קואורדינטות שהועתקו מהאפליקציה (גיבוי אם ה-GPS האוטומטי לא זמין)
 document.getElementById('loc-manual-save').addEventListener('click', () => {
   const raw = document.getElementById('loc-manual-input').value.trim();
   if(!raw){ showToast('הדבק קודם קישור או קואורדינטות'); return; }
@@ -836,7 +766,7 @@ document.getElementById('loc-manual-save').addEventListener('click', () => {
     document.getElementById('waze-url-copy').addEventListener('click', () => copyText(wazeUrl, 'הקישור הועתק'));
     document.getElementById('waze-url-box').addEventListener('click', function(){ this.select(); });
   }
-  photoLocBtn.classList.add('captured');
+  secureLocBtn.classList.add('captured');
   document.getElementById('loc-manual-input').value = '';
   showToast('המיקום נשמר');
 });
@@ -957,7 +887,7 @@ document.getElementById('btn-copy').addEventListener('click', () => {
 
 // שליחת הדוח למיילים הקבועים
 // כתובות הנמענים - לתצוגה ולגיבוי הידני. השליחה האוטומטית נשלטת ע"י הזרימה ב-Power Automate.
-const REPORT_RECIPIENTS = ['pv@menergy.co.il'];
+const REPORT_RECIPIENTS = ['dror@menergy.co.il', 'eng@menergy.co.il', 'Tiful@menergy.co.il'];
 const LOGO_SVG = '<svg width="54" height="54" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">' +
   '<path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>' +
   '<path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>' +
@@ -1073,13 +1003,13 @@ function manualSendFallback(subject, project){
 document.getElementById('btn-send-email').addEventListener('click', async () => {
   const btn = document.getElementById('btn-send-email');
 
-  // חובה: לא ניתן לשלוח דוח ללא תמונת מיקום הפרויקט
+  // חובה: לא ניתן לשלוח דוח ללא תפיסת מיקום הפרויקט
   if(!savedLocation){
-    showToast('יש לצלם את מיקום הפרויקט לפני שליחת הדוח');
+    showToast('יש ללכוד את מיקום הפרויקט לפני שליחת הדוח');
     const locBlock = document.querySelector('.loc-block');
     if(locBlock) locBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    photoLocBtn.classList.add('needs-attention');
-    setTimeout(() => photoLocBtn.classList.remove('needs-attention'), 1600);
+    secureLocBtn.classList.add('needs-attention');
+    setTimeout(() => secureLocBtn.classList.remove('needs-attention'), 1600);
     return;
   }
 
@@ -1098,12 +1028,15 @@ document.getElementById('btn-send-email').addEventListener('click', async () => 
   const orig = btn.textContent;
   btn.textContent = '⌛ שולח דוח...'; btn.disabled = true;
   try {
+    const verdictBtnEl = document.querySelector('.verdict-btn.active');
     const payload = {
       subject: subject,
       filename: filename,
       recipients: REPORT_RECIPIENTS.join(';'),
       project: project,
       date: date,
+      inspector: document.getElementById('signoff-name').value || '',
+      verdict: verdictBtnEl ? verdictBtnEl.textContent.trim() : 'לא נקבע',
       html: buildReportHTML()
     };
     // mode:no-cors + text/plain: מונע preflight ו-CORS מול Power Automate.
