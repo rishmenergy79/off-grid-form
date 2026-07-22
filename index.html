@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>נוהל בדיקות Off Grid – טופס בדיקות למערכת PV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f2f7fb; --card:#ffffff; --ink:#1c2a33; --ink-soft:#5c6b76;
+    --line:#dfe8ef; --brand:#1f9ed6; --brand-dark:#157fb8; --brand-soft:#e7f4fb;
+    --accent:#f7a81e; --accent-soft:#fdefcf;
+    --ok:#1f8a4c; --ok-bg:#e7f6ec; --bad:#c23b3b; --bad-bg:#fbeaea;
+    --na:#8a8f98; --na-bg:#eef1f4; --exp:#157fb8; --exp-bg:#eaf5fc;
+    --radius:14px; --shadow:0 1px 3px rgba(20,40,55,.07),0 1px 2px rgba(20,40,55,.04);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);
+    font-family:'Rubik',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.45;padding-bottom:110px;}
+
+  /* לוגו מאורות */
+  .brandbar{background:#fff;padding:16px 16px 14px;border-bottom:3px solid var(--accent);}
+  .brand{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:13px;}
+  .brand .txt{display:flex;flex-direction:column;line-height:1;}
+  .brand .name{font-size:34px;font-weight:900;color:var(--brand);letter-spacing:-.5px;}
+  .brand .tag{font-size:13.5px;font-weight:500;color:#45bfe8;margin-top:5px;}
+
+  header{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;padding:18px 16px 18px;}
+  header h1{margin:0 0 4px;font-size:19px;font-weight:700;}
+  header p{margin:0;font-size:13px;opacity:.9;}
+  .wrap{max-width:760px;margin:0 auto;padding:14px 12px 0;}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    margin-bottom:12px;overflow:hidden;border:1px solid var(--line);}
+  .card-title{font-size:14px;font-weight:700;padding:13px 14px 0;color:var(--brand);}
+  .general-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+  .general-grid .full{grid-column:1/-1;}
+  .field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;}
+  .field input,.field textarea{width:100%;padding:9px 10px;border:1px solid var(--line);
+    border-radius:9px;font-size:14px;font-family:inherit;background:#fbfbfc;color:var(--ink);}
+  .field input:focus,.field textarea:focus{outline:2px solid var(--brand);outline-offset:0;background:#fff;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;
+    padding:11px 14px;border-top:1px solid var(--line);gap:10px;}
+  .toggle-row .tlabel{font-size:13.5px;font-weight:600;flex:1;}
+  .toggle-group{display:flex;gap:5px;flex-shrink:0;}
+  .toggle-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+  .toggle-btn.yes.active{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .toggle-btn.no.active{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .toggle-btn.opt.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+  .loc-block{padding:0 14px 14px;}
+  .loc-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#33ccff;
+    color:#03354a;font-size:14px;font-weight:700;cursor:pointer;display:flex;
+    align-items:center;justify-content:center;gap:6px;}
+  .loc-btn:active{opacity:.85;}
+  .loc-btn.captured{background:var(--ok-bg);color:var(--ok);}
+  .loc-result{margin-top:9px;font-size:13px;line-height:1.6;}
+  .loc-result .coords{color:var(--ink-soft);font-size:12.5px;}
+  .loc-result a{display:inline-flex;align-items:center;gap:6px;margin-top:6px;
+    background:#33ccff;color:#03354a;text-decoration:none;font-weight:700;
+    padding:9px 14px;border-radius:9px;font-size:13.5px;}
+  .loc-result .err{color:var(--bad);font-size:12.5px;}
+  .loc-btn-primary{background:var(--brand);}
+  .loc-btn-primary.needs-attention{animation:loc-shake .4s ease 2, loc-flash 1.6s ease;}
+  @keyframes loc-shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  @keyframes loc-flash{0%{box-shadow:0 0 0 0 rgba(194,59,59,.6);}50%{box-shadow:0 0 0 8px rgba(194,59,59,0);}100%{box-shadow:0 0 0 0 rgba(194,59,59,0);}}
+  .loc-alt{display:flex;justify-content:center;gap:8px;margin-top:9px;font-size:12px;}
+  .loc-btn-text{background:none;border:none;color:var(--brand-dark);text-decoration:underline;
+    font-size:12px;cursor:pointer;padding:2px 4px;}
+  .loc-alt-sep{color:var(--ink-soft);}
+  .loc-manual{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .loc-manual-label{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:6px;}
+  .loc-manual-row{display:flex;gap:6px;}
+  .loc-manual-row input{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:9px;
+    font-size:13px;font-family:inherit;background:#fbfbfc;}
+  .loc-manual-row button{background:var(--brand);color:#fff;border:none;border-radius:9px;
+    padding:0 16px;font-size:13.5px;font-weight:700;cursor:pointer;flex-shrink:0;}
+  .loc-manual-row button:active{opacity:.85;}
+  .loc-manual-hint{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5;}
+  .loc-url-row{display:flex;gap:6px;margin-top:8px;}
+  .loc-url-row input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;
+    font-size:12px;font-family:Consolas,Menlo,monospace;direction:ltr;text-align:left;
+    background:#f7fafc;color:#0b4a68;min-width:0;}
+  .loc-url-row button{width:42px;border:1px solid var(--line);border-radius:8px;background:#fff;
+    font-size:15px;cursor:pointer;flex-shrink:0;}
+  .loc-url-row button:active{background:var(--brand-soft);}
+
+  .progress-bar-wrap{padding:12px 14px;}
+  .progress-top{display:flex;justify-content:space-between;align-items:center;
+    font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;}
+  .progress-track{height:8px;background:var(--line);border-radius:5px;overflow:hidden;display:flex;}
+  .progress-fill-ok{background:var(--ok);height:100%;}
+  .progress-fill-bad{background:var(--bad);height:100%;}
+  .badge-issues{display:none;align-items:center;gap:5px;background:var(--bad-bg);color:var(--bad);
+    font-weight:700;font-size:12.5px;padding:4px 9px;border-radius:20px;}
+  .badge-issues.show{display:inline-flex;}
+
+  .part-header{font-size:15px;font-weight:700;color:var(--brand-dark);
+    padding:6px 4px 6px 4px;margin-top:6px;letter-spacing:.2px;
+    border-right:4px solid var(--accent);padding-right:10px;}
+  .part-note{font-size:12px;color:var(--ink-soft);padding:0 4px 8px;line-height:1.55;}
+
+  .section{border-bottom:1px solid var(--line);}
+  .section:last-child{border-bottom:none;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;
+    padding:13px 14px;cursor:pointer;user-select:none;background:#fff;}
+  .section-head:active{background:#fafafa;}
+  .section-title{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .section-count{font-size:11.5px;font-weight:600;color:var(--ink-soft);
+    background:var(--na-bg);padding:2px 8px;border-radius:20px;white-space:nowrap;}
+  .section-count.complete{color:var(--ok);background:var(--ok-bg);}
+  .chevron{width:10px;height:10px;border-right:2px solid var(--ink-soft);
+    border-bottom:2px solid var(--ink-soft);transform:rotate(45deg);transition:transform .18s ease;margin-left:4px;}
+  .section.open .chevron{transform:rotate(-135deg);}
+  .section-body{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fcfcfd;}
+  .section.open .section-body{max-height:20000px;}
+
+  .item{padding:12px 14px;border-top:1px solid var(--line);}
+  .item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .item-text{font-size:13.6px;color:var(--ink);flex:1;padding-top:2px;}
+  .item-num{color:var(--ink-soft);font-weight:700;margin-left:5px;}
+  .item-exp{font-size:12.5px;color:#2b4a7a;background:var(--exp-bg);
+    border-radius:8px;padding:7px 9px;margin-top:8px;line-height:1.5;}
+  .item-exp b{color:var(--exp);font-weight:700;}
+  .status-group{display:flex;gap:5px;flex-shrink:0;}
+  .status-btn{min-width:40px;height:34px;padding:0 7px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;font-size:12px;font-weight:700;color:var(--ink-soft);cursor:pointer;white-space:nowrap;
+    display:flex;align-items:center;justify-content:center;}
+  .status-btn.na{min-width:64px;}
+  .status-btn.ok.active{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .status-btn.bad.active{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .status-btn.na.active{background:var(--na);border-color:var(--na);color:#fff;}
+  .item-note{margin-top:8px;}
+  .item-note label{font-size:11px;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:3px;}
+  .item-note input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px;
+    font-size:13px;font-family:inherit;background:#fff;}
+  .item-note input::placeholder{color:#a8adb5;}
+  .note-row{display:flex;gap:6px;}
+  .note-row input[type=text]{flex:1;min-width:0;}
+  .photo-btn{width:42px;border:1px solid var(--line);border-radius:8px;background:#fff;
+    font-size:16px;cursor:pointer;flex-shrink:0;}
+  .photo-btn:active{background:var(--brand-soft);}
+  .photo-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .photo-thumb{position:relative;}
+  .photo-thumb img{width:76px;height:76px;object-fit:cover;border-radius:8px;
+    border:1px solid var(--line);display:block;}
+  .photo-thumb button{position:absolute;top:-6px;left:-6px;width:20px;height:20px;
+    border-radius:50%;border:none;background:var(--bad);color:#fff;font-size:11px;
+    cursor:pointer;line-height:1;padding:0;}
+
+  .footer-actions{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;
+    box-shadow:0 -2px 10px rgba(0,0,0,.06);z-index:20;}
+  .btn{flex:1;padding:12px 8px;border-radius:10px;border:none;font-size:13.5px;font-weight:700;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .btn-primary{background:var(--brand);color:#fff;}
+  .btn-secondary{background:var(--brand-soft);color:var(--brand);}
+  .btn-ghost{background:var(--na-bg);color:var(--ink);}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1c2230;color:#fff;
+    padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;
+    transition:opacity .25s ease;z-index:30;}
+  .toast.show{opacity:1;}
+
+  .note-block{padding:14px;}
+  .note-block textarea{min-height:70px;resize:vertical;}
+  .signoff{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px;}
+  .verdict-group{padding:0 14px 14px;display:flex;gap:8px;flex-wrap:wrap;}
+  .verdict-btn{flex:1;min-width:150px;padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);
+    background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-soft);}
+  .verdict-btn.pass.active{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);}
+  .verdict-btn.fail.active{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);}
+  .email-block{padding:2px 14px 14px;}
+  .recipients{background:var(--brand-soft);border-radius:9px;padding:9px 11px;margin:4px 0 10px;font-size:12.5px;line-height:1.6;}
+  .recipients .rlabel{font-weight:700;color:var(--brand-dark);margin-left:5px;}
+  .recipients .rlist{color:var(--ink);}
+  .email-send-btn{width:100%;padding:13px;border-radius:10px;border:none;
+    background:var(--accent);color:#4a3200;font-size:14.5px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;}
+  .email-send-btn:active{opacity:.88;}
+  .email-send-btn:disabled{opacity:.7;}
+  .email-hint{font-size:11.5px;color:var(--ink-soft);margin-top:7px;line-height:1.5;}
+  .disclaimer{font-size:11.5px;color:var(--ink-soft);padding:10px 14px 4px;line-height:1.6;}
+
+  @media print{
+    body{padding-bottom:0;background:#fff;}
+    header{background:#fff !important;color:#000;padding:8px 0;}
+    header p{color:#333;}
+    .footer-actions,.toast{display:none !important;}
+    .section-body{max-height:none !important;}
+    .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+    .section,.item{break-inside:avoid;}
+    .status-btn{border:1px solid #999;}
+    .chevron{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <div class="brand">
+    <svg width="70" height="70" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="מאורות">
+      <path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>
+      <path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>
+      <path d="M70 54 L104 22" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round"/>
+      <path d="M88 20 L106 20 L106 38" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M42 74 L54 60 L64 68 L82 44" stroke="#1f9ed6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M42 82 L74 82" stroke="#f7a81e" stroke-width="7" stroke-linecap="round"/>
+    </svg>
+    <div class="txt">
+      <span class="name">מאורות</span>
+      <span class="tag">כל האנרגיה בשבילך</span>
+    </div>
+  </div>
+</div>
+<header>
+  <div class="wrap" style="padding:0;">
+    <h1>נוהל בדיקות Off Grid – טופס בדיקות למערכת PV</h1>
+    <p>רשימת תיוג לבדיקה מכאנית וחשמלית של מערכת פוטו-וולטאית עצמאית (Off-Grid)</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- פרטי הפרויקט -->
+  <div class="card">
+    <div class="card-title">פרטי הפרויקט</div>
+    <div class="general-grid">
+      <div class="field full"><label>שם ומספר הפרוייקט</label><input type="text" id="gen-project" placeholder="שם ומספר"></div>
+      <div class="field"><label>תאריך הבדיקה</label><input type="date" id="gen-date"></div>
+      <div class="field"><label>מנהל הבדיקה</label><input type="text" id="gen-manager" placeholder="שם מלא"></div>
+      <div class="field full"><label>הקבלן המבצע</label><input type="text" id="gen-contractor" placeholder="שם הקבלן"></div>
+    </div>
+    <!-- מיקום Waze -->
+    <div class="loc-block">
+      <button type="button" id="btn-location-photo" class="loc-btn loc-btn-primary">📷 צלם תמונה של מיקום הפרויקט (חובה)</button>
+      <input type="file" id="loc-photo-input" accept="image/*" capture="environment" style="display:none">
+      <div id="loc-result" class="loc-result"></div>
+      <div class="loc-alt">
+        <button type="button" id="btn-location" class="loc-btn-text">נסה איתור מיקום אוטומטי של הדפדפן</button>
+        <span class="loc-alt-sep">·</span>
+        <button type="button" id="btn-location-manual-toggle" class="loc-btn-text">הדבקת קישור ידנית</button>
+      </div>
+      <div class="loc-manual" id="loc-manual-box" style="display:none;">
+        <div class="loc-manual-row">
+          <input type="text" id="loc-manual-input" placeholder="הדבק כאן קישור Waze (או קואורדינטות)">
+          <button type="button" id="loc-manual-save">שמור</button>
+        </div>
+        <div class="loc-manual-hint">באפליקציית Waze: לחץ על המיקום שלך ← שתף ← העתק קישור, וחזור לכאן להדביק.</div>
+      </div>
+    </div>
+    <!-- ריכוז בדיקות -->
+    <div class="card-title" style="padding-top:6px;">ריכוז בדיקות (OFF-GRID)</div>
+    <div class="toggle-row" data-toggle="strings">
+      <span class="tlabel">תוכניות סטרינגים</span>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" data-val="יש">יש</button>
+        <button class="toggle-btn no" data-val="אין">אין</button>
+      </div>
+    </div>
+    <div class="toggle-row" data-toggle="drone">
+      <span class="tlabel">צילום רחפן גובה 30 מטר</span>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" data-val="יש">יש</button>
+        <button class="toggle-btn no" data-val="אין">אין</button>
+      </div>
+    </div>
+    <div class="toggle-row" data-toggle="internet">
+      <span class="tlabel">תקשורת אינטרנט</span>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" data-val="יש">יש</button>
+        <button class="toggle-btn no" data-val="אין">אין</button>
+      </div>
+    </div>
+    <div class="toggle-row" data-toggle="commtype">
+      <span class="tlabel">סוג התקשורת</span>
+      <div class="toggle-group">
+        <button class="toggle-btn opt" data-val="קווי">קווי</button>
+        <button class="toggle-btn opt" data-val="WiFi">WiFi</button>
+        <button class="toggle-btn opt" data-val="סים">סים</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- פס התקדמות -->
+  <div class="card">
+    <div class="progress-bar-wrap">
+      <div class="progress-top">
+        <span id="progress-label">0 מתוך 0 סעיפים נבדקו</span>
+        <span id="badge-issues" class="badge-issues">⚠ <span id="issues-count">0</span> נכשלו</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill-ok" id="fill-ok" style="width:0%"></div>
+        <div class="progress-fill-bad" id="fill-bad" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="parts-container"></div>
+
+  <!-- סיכום -->
+  <div class="card">
+    <div class="section-head" style="cursor:default;"><div class="section-title">סיכום ומסקנות</div></div>
+    <div class="note-block">
+      <div class="field"><label>הערות כלליות / ליקויים שהתגלו</label>
+        <textarea id="summary-notes" placeholder="פירוט חופשי של ממצאים, ליקויים ופעולות נדרשות..."></textarea>
+      </div>
+    </div>
+    <div class="verdict-group">
+      <button class="verdict-btn pass" data-verdict="pass">✔ המערכת עברה את הבדיקה</button>
+      <button class="verdict-btn fail" data-verdict="fail">✖ נדרש תיקון / בדיקה חוזרת</button>
+    </div>
+    <div class="signoff">
+      <div class="field"><label>שם וחתימת הבודק</label><input type="text" id="signoff-name" placeholder="שם"></div>
+      <div class="field"><label>תאריך</label><input type="date" id="signoff-date"></div>
+    </div>
+    <!-- שליחת דוח במייל -->
+    <div class="email-block">
+      <div class="recipients">
+        <span class="rlabel">הדוח יישלח אל:</span>
+        <span class="rlist">pv@menergy.co.il (מצב בדיקה)</span>
+      </div>
+      <button type="button" id="btn-send-email" class="email-send-btn">✉ שליחת הדוח</button>
+      <div class="email-hint">לאחר חיבור השירות (Power Automate): לחיצה אחת שולחת אוטומטית PDF לשלושת הנמענים. עד אז — לחיצה מעתיקה את הדוח ופותחת מייל מוכן.</div>
+    </div>
+    <div class="disclaimer">
+      הבדיקות החשמליות יבוצעו במכשירי מדידה שעברו כיול במעבדה מוסמכת בשנה האחרונה; טווח הסטייה של מכשירי המדידה לא יעלה על 2%. מסמך זה הוא רשימת תיוג לסיוע בבדיקה ואינו מהווה תחליף לבדיקת חשמלאי/בודק מוסמך ולעמידה בתקנים הרלוונטיים (לרבות ת"י 981 ותקנות החשמל התקפות).
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-actions">
+  <button class="btn btn-ghost" id="btn-reset">איפוס</button>
+  <button class="btn btn-secondary" id="btn-copy">העתק סיכום</button>
+  <button class="btn btn-primary" id="btn-print">ייצוא / הדפסה</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== תוכן הטופס (מבוסס על טופס בדיקות PV - Off Grid, 7 עמודים) =====
+// כל פריט: crit = קריטריון הבדיקה (מה לבדוק), exp = תוצאה צפויה
+const PARTS = [
+  {
+    part: 'א. בדיקות מכאניות',
+    note: '',
+    sections: [
+      {
+        id:'a1-cables', title:'שילוט – כבלים ומובילים', items:[
+          {crit:'מובילים – יש לוודא התקנת שלטי חובה על המובילים בהתאם לייעוד ולתקנות.', exp:'השילוט על המובילים יציב, מחומר מתאים לחשיפה לקרינת UV ובמרחקים של 3 מ׳.'},
+          {crit:'כבלי DC – יש לבדוק סימון כתובת המערך ומספר הממיר אליו הוא מחובר בשני הקצוות.', exp:'הכבלים ניתנים לזיהוי לאורך התוואי.'},
+          {crit:'כבלי AC – יש לבדוק סימון כתובת הכבל בשני הקצוות.', exp:'הכבלים ניתנים לזיהוי לאורך התוואי.'},
+        ]
+      },
+      {
+        id:'a1-dc', title:'שילוט – מפסקים, לוחות DC וממירים', items:[
+          {crit:'לוחות DC – בדוק שילוט כתובת ומספר סטרינג. בדוק קיום וחוזק התקנת השילוט שהגיע מיצרן הלוחות.', exp:'קיים שילוט עמיד בתנאי חוץ, מתאפשר זיהוי ברור של שלטי אזהרה וזיהוי.'},
+          {crit:'מפסקים – בדוק סימון סטרינגים בהתאם לתכנית ההצבה.', exp:'השילוט ברור ועמיד לתנאי חוץ.'},
+          {crit:'ממירים – בדוק מספר מותאם על הממיר ועל המפסק השייך אליו. בצע זיהוי פיזי ע״י הפעלה וניתוק הממיר.', exp:'מספר המפסק נכון למספר הממיר אליו הוא שייך.'},
+        ]
+      },
+      {
+        id:'a1-ac', title:'שילוט – לוחות AC', items:[
+          {crit:'כללי – בדוק שלטי בטיחות ושלטי חובה.', exp:'שלטי בטיחות ואזהרה ברורים וקריאים.'},
+          {crit:'בדוק שילוט אזהרה, מספור מתאים על הממיר ועל המפסק השייך אליו. בצע זיהוי פיזי ע״י הפעלה וניתוק הממיר.', exp:'מספר המפסק נכון למספר הממיר אליו הוא שייך; שלטי האזהרה ברורים וקריאים; הפחיות ניתנות לקריאה והתקנתן יציבה.'},
+          {crit:'בדוק שלטי בטיחות ושלטי חובה.', exp:'שלטי בטיחות ואזהרה ברורים וקריאים.'},
+        ]
+      },
+      {
+        id:'a1-grnd', title:'שילוט – הארקה', items:[
+          {crit:'בדוק שילוט מזהה בקופסאות פסי החיווט.', exp:'הקופסא ניתנת לזיהוי ככתובת הארקה.'},
+          {crit:'בדוק סימון כתובת המוליכים בלוחות ובפסי ההשוואה.', exp:'ניתן לזהות את שייכות וייעוד המוליך.'},
+          {crit:'בדוק שלטי "הארקה לא לפרק" בנקודות החיבור הראשיות.', exp:'נקודות החיבור ניתנות לזיהוי.'},
+        ]
+      },
+      {
+        id:'a2-panels', title:'חיזוק מכאני – פנלים (כל המערכים)', items:[
+          {crit:'תעד נזקים כלשהם בתכנית ההצבה.', exp:'אין נזקים לתעד.'},
+          {crit:'בצע בדיקה ויזואלית ובסרט מדידה (היכן שנדרש) מפני עיוותים הנובעים מלחצים מכאניים על המסגרת.', exp:'לא קיימים עיוותים בכלל.'},
+          {crit:'בדוק בכלים מתאימים את הידוק בורגי הפנלים למסילות עד ליצירת מגע מלא בין המשטחים.', exp:'כל הברגים קיימים ומחוזקים וקיים מגע מלא בין המשטחים ללא חופש.'},
+          {crit:'הזז את הפנל לבדיקת חוזק ההתקנה.', exp:'לא ניתן להזיז את הפנל.'},
+        ]
+      },
+      {
+        id:'a2-inv', title:'חיזוק מכאני – ממירים', items:[
+          {crit:'בדוק יציבות גב העבודה ויזואלית ופיזית ע״י הפעלת כוח מתון.', exp:'הגב יציב ולא ניתן להזיזו.'},
+          {crit:'בדוק את גב העבודה מפני עיוותים, פגיעות מכאניות, גלוון והתקנה ישרה באמצעות פלס מכייל. בדוק שאין סכנת פציעה מנגדים ופינות חדות.', exp:'לא קיימים עיוותים; קיים גלוון תקין גם בנקודות ריתוך (אם בוצע); אין פגיעות מכאניות והגב ישר ומפולס; לא קיימים גרדים וסכנת פציעה.'},
+          {crit:'בדוק שגובה התקנת הממירים בתחום המותר ע״י היצרן.', exp:'הממירים מותקנים בתחום ההתקנה התקין של היצרן.'},
+          {crit:'בדוק שדרגת ההגנה של הממיר (IPxx) תואמת למקום התקנתו, בהתאם לת״י 981, ספר החוץ ותקנות החשמל.', exp:'מקום התקנת הממיר תואם לדרגת ההגנה שלו.'},
+          {crit:'בדוק את שלמות הממיר, העדר שריטות ופגיעות, שכל הברגים במקומם.', exp:'הממיר שלם וללא פגיעות וכל הברגים במקומם.'},
+          {crit:'בדוק את חוזק ההתקנה ע״י הפעלת כוח פיזי מתון.', exp:'הממיר יציב ולא ניתן להזיזו.'},
+          {crit:'בדוק מפני חסימת פתחי אוורור – בצע מדידת מרווחים והשווה לתכנית הצבת הממירים והוראות היצרן בספר ההתקנה.', exp:'פתחי האוורור פנויים והמרווחים תואמים למידות שבתכנית הצבת הממירים והוראות היצרן.'},
+          {crit:'בדוק שמדבקות הזיהוי גלויות לחלוטין.', exp:'מדבקות הזיהוי גלויות לחלוטין.'},
+        ]
+      },
+      {
+        id:'a2-boards', title:'חיזוק מכאני – לוחות חשמל AC-DC', items:[
+          {crit:'בדוק העדר מתח לפני תחילת הבדיקה במכשיר מדידה תקין.', exp:'אין מתח על הלוח לפני תחילת הבדיקה.'},
+          {crit:'בדוק שדרגת ההגנה של הלוח (IPxx) תואמת למקום התקנתו, בהתאם לת״י 981, ספר החוק ותקנות החשמל.', exp:'מיקום הלוח תואם לדרגת ההגנה המצוינת עליו.'},
+          {crit:'בדוק את שלמות הלוח, העדר שריטות ופגיעות, שכל הברגים במקומם.', exp:'הלוח שלם וללא פגיעות וכל הברגים במקומם.'},
+          {crit:'בדוק את חוזק ההתקנה ע״י הפעלת כוח פיזי מתון.', exp:'הלוח יציב ולא ניתן להזיזו.'},
+          {crit:'בדוק שגובה אמצעי הניתוק תואם לתחום המותר.', exp:'גובה אמצעי הניתוק הינו בתחום המותר: 0.5–2.0 מ׳.'},
+          {crit:'בדוק שכל הברגים בלוח מחוזקים היטב (בכלים מתאימים). נסה למשוך מעט את המוליך הראשי.', exp:'כל הברגים בלוח מחוזקים והמוליכים אינם ניתנים להזזה ומשיכה.'},
+          {crit:'בדוק שאין עיוותים ופגיעות בבורגי הקופסאות ושהמפסקים נפתחים ונסגרים בקלות וללא הפעלת כוח.', exp:'לא קיימים עיוותים וכל הלוחות נפתחים ונסגרים בהתאמה.'},
+          {crit:'בדוק אטמים ואביזרים מגנים מפני חדירת אבק ומים. בדוק את היחידה ותקינות כניסות הכבלים לאזור.', exp:'קיימים אטמים ואביזרים מגנים מפני חדירת אבק ומים בהתאם לדרגת ההתקנה, וכל כניסות הכבלים והקדחים מהודקות ואטומות.'},
+        ]
+      },
+      {
+        id:'a2-const', title:'חיזוק מכאני – שלמות ויושר הקונסטרוקציה, עוגנים ודיאגונלים', items:[
+          {crit:'בדוק את קיום והתאמת הקונסטרוקציה ע״י מדידה והתאמה לתכנית הביצוע.', exp:'הקונסטרוקציה מותקנת בהתאם לתכנית הביצוע.'},
+          {crit:'בדוק תעלון, העדר שריטות ושלמות עמידה.', exp:'התעלון שלם, לא קיימות שריטות עמוקות.'},
+          {crit:'בדוק העדר עיוותים, כיפופים, סימני קורוזיה והתקנה ישרה. מדוד בסרט מדידה ופלס.', exp:'לא קיימים עיוותים וכיפופים, ההתקנה ישרה ומפולסת בהתאם לאיכות הגג.'},
+          {crit:'בדוק קיום יריעות בידוד ואיטום נקודות חדירה בין הקונסטרוקציה לגג.', exp:'קיימות יריעות בידוד בכל נקודות המגע וכל נקודות החדירה אטומות היטב.'},
+          {crit:'בדוק שכל הברגים קיימים ומחוזקים עד ליצירת מגע מלא בין המשטחים; קיימות דיסקיות משוננות אנטי-נעילה למניעת שחרור. הפעל כוח פיזי מתון לבדיקת חוזק ההתקנה.', exp:'כל הברגים קיימים ומחוזקים, מגע מלא בין המשטחים ודיסקיות אנטי-נעילה במקומן.'},
+          {crit:'בדוק רציפות של מסילות ושרשור ההארקה שחוברה, בהתאם להוראות היצרן.', exp:'חיבור ההארקה ורציפות התעלות נעשו באופן תקין ובהתאם להוראות היצרן.'},
+          {crit:'בדוק חיתוך סופי של המסילות, השלמת פקקים, העדר גרדים וחלקים בולטים.', exp:'החיתוכים ישרים ותקינים, בכל סוף מסילה הותקן פקק בהתאם לסוג החומר, אין גרדים וחלקים בולטים.'},
+          {crit:'בדוק קיום דיאגונלים בהתאם לתכנית הביצוע ובדוק את אופן חיווקם לשלד.', exp:'קיימים דיאגונלים מחוזקים בהתאם לתכנית הביצוע.'},
+          {crit:'בדוק עוגנים בהתאם לתכנית הביצוע ואת חיווקם.', exp:'העוגנים מותקנים בהתאם לתכנית הביצוע של החיווקים.'},
+          {crit:'בדוק את חיווק העוגנים, הידוק בורגי המהדקים, פיגול ג׳ידים בכבל המתיחה ודרגת מתיחתם בהתאם להנחיות הקונסטרוקטור.', exp:'העוגנים מחוזקים למבנה וכל בורגי המהדקים, הג׳ידים ודרגת המתיחה בהתאם להנחיות הקונסטרוקטור.'},
+        ]
+      },
+      {
+        id:'a2-conduit', title:'חיזוק מכאני – שלמות וחיווק מובילים AC-DC', items:[
+          {crit:'בדוק שתוואי המובילים תואם לתכנית הביצוע.', exp:'תוואי המובילים תואם לתכנית הביצוע.'},
+          {crit:'בדוק את התאמת סוג המוביל וחיווקו למקום ההתקנה ולשכנות הצפויה.', exp:'המוביל מתאים למקום ההתקנה.'},
+          {crit:'בדוק את שלמות המובילים, גלוון, רציפות בין חלקים, העדר עיוותים ופגיעות ושלמות המכסים והצמדתם.', exp:'המובילים שלמים, רציפים לכל אורכם, אין עיוותים ופגיעות, קיים גלוון מלא וכל המכסים שלמים ומקובעים היטב לתעלה.'},
+          {crit:'בדוק רציפות חשמלית בין חלקים מתחברים והארקתם לאדמה. וודא שפירוק מכסה לא יפגע ברציפות ההארקה לחלקים אחרים.', exp:'כל חלקי המוביל מחוזקים היטב להארקה וקיימת רציפות חשמלית גם לאחר פירוק מכסים.'},
+        ]
+      },
+      {
+        id:'a2-wires', title:'חיזוק מכאני – תקינות והתקנת כבלים AC-DC', items:[
+          {crit:'בדוק שחתך הכבלים תואם לתכנית הביצוע (התכנית החד-קווית).', exp:'חתך הכבלים תואם לתכנית הביצוע.'},
+          {crit:'בדוק את שלמות הכבלים והעדר פגיעות בבידוד.', exp:'לא קיימות פגיעות בבידוד הכבלים.'},
+          {crit:'בדוק שהכבלים מתוחים ותפוסים לתעלה במרחקים שווים ובאופן מסודר וללא הצלבות.', exp:'כל הכבלים תפוסים לתעלה בקטעים שווים וללא הצלבות.'},
+          {crit:'בדוק שבתוך המוביל קיימת הפרדה מלאה בין כבלי תקשורת לכבלי AC ו-DC.', exp:'לא קיים כל ערוב בין כבלים ממתח שונה וסוג שונה: תקשורת וחשמל, AC ו-DC.'},
+          {crit:'בדוק את התקנת הכבלים בהתאם לתקנות: הגנה מפגיעה מכאנית, שימוש בספירלת חוט והתאמה לגודל המבטח בראשית קו ההזנה.', exp:'לא קיימת סכנה לפגיעה מכאנית בכבלים, בכל המוליכים השזורים בשימוש ספירלת חוט ושטח חתך תואם לגודל המבטח.'},
+        ]
+      },
+      {
+        id:'a2-boxes', title:'חיזוק מכאני – קופסאות חשמל', items:[
+          {crit:'בדוק שהקופסאות ממוקמות בהתאם לתכנית ההצבה לביצוע.', exp:'קיימת התאמה עם סטייה בטווח של עד 1 מ׳.'},
+          {crit:'בדוק שכל בורגי החיזוק במקומם ומחוזקים היטב.', exp:'כל קופסאות החשמל מחוברות ויציבות במקומן.'},
+          {crit:'בדוק עיוותים הנובעים מחיזוק יתר או התקנה על מישור שאינו אחיד.', exp:'אין כל עיוות בקופסא והקופסא אינה מתעגלת.'},
+          {crit:'בדוק העדר חורים וסדקים; אנטיגרונים מהודקים היטב ומותקנים בקדח מתאים למידתם.', exp:'אין חורים וסדקים; האנטיגרונים מותקנים היטב ומהודקים בקדח מתאים למידתם.'},
+        ]
+      },
+      {
+        id:'a2-string', title:'חיזוק מכאני – שרשור כבילה בין הפנלים', items:[
+          {crit:'בדוק התאמה לתכנית ההצבה לביצוע. השווה בין חיצי הסימון בתכנית לשרשור בפועל.', exp:'קיימת התאמה מלאה.'},
+          {crit:'בדוק את חיבורי השרשורים ע״י התאמת המחברים והצמדתם המלאה; נסה למשוך מעט את הכבלים וזהה חופש תנועה חריג.', exp:'כל המחברים חוברו כראוי והחיבור יציב וחזק; אין חופש תנועה במשיכת הכבל.'},
+        ]
+      },
+      {
+        id:'a2-earthconn', title:'חיזוק מכאני – חיבור הארקות', items:[
+          {crit:'בדוק חיבור וישור הארקה בין הפנלים לקונסטרוקציה. וודא שימוש בשייבה משוננת וחיבור מובדל. בדוק רציפות במכשיר בין מסגרות הפנלים אל נקודות החיבור הראשיות.', exp:'חיבור וישור הארקה בין הפנלים לקונסטרוקציה עם שייבה משוננת וחיבור מובדל; קיימת רציפות ממסגרת הפנל לחיבור ההארקה הראשי של הקונסטרוקציה.'},
+          {crit:'בדוק חיבור הארקות לכל חלקי תעלות המבטח כולל המכסים. בתעלות בעלות חיבורים גלווניים בין החלקים ניתן לחבר מוליך הארקה בנקודה אחת.', exp:'כל חלקי המתכת מחוברים להארקה וקיימת רציפות חשמלית בין החלקים.'},
+          {crit:'בדוק את חיבור מוליך ההארקה לממיר בשתי נקודות: 1) פנימי עם כבל התחנה 2) חיצוני לגוף הממיר במוליך 16 ממ״ר. בצע בדיקת רציפות לפס ההשוואה בלוח האיזון.', exp:'קיימת רציפות חשמלית בין גוף הממיר לפס ההשוואה.'},
+          {crit:'בדיקת הארקה בלוח מונה: בדוק את חיבור מוליך ההארקה למונה ווודא ששטח חתך המוליך מתאים לגודל המפסק הראשי.', exp:'מוליך ההארקה מחובר בצורה תקינה ומחוזק היטב לפס ההשוואה; שטח חתך המוליך תואם לגודל המפסק הראשי.'},
+          {crit:'בדוק את חיבור כבלי ההארקה לפס״ח הראשי. בדוק חיזוק ברגים ואומים ואת הצמדת נעלי הכבל לפס. נסה להזיז את המוליך כדי לוודא חופש.', exp:'נעלי הכבל מהודקות היטב לפס ולא מתאפשרת הזזתן.'},
+          {crit:'בדוק את חיבור מוליכי ההארקה לשלד הקונסטרוקציה ווודא רציפות בין חלקי השלד בבדיקת רציפות.', exp:'המוליך מהודק היטב בבורג, אום ושייבה משוננת וקיימת רציפות מלאה בין חלקי השלד.'},
+        ]
+      },
+      {
+        id:'a2-clean', title:'חיזוק מכאני – בדיקת ניקיון בסיום התקנה', items:[
+          {crit:'וודא פינוי משטחים, קרטונים, לכלוך ושאריות התקנה מהגג.', exp:'הגג פנוי לחלוטין מציוד ושאריות התקנה ובוצע ניקיון ע״י הקבלן המבצע.'},
+          {crit:'בדוק את שלמות הגג ובחן והשווה נזקים לתיעוד ותמונות טרום התקנה.', exp:'הגג אינו פגוע כתוצאה מהתקנה וכל הפגיעות טופלו ותוקנו לשביעות רצון הלקוח.'},
+          {crit:'בדוק את ניקיון הפנלים.', exp:'הפנל נקי וללא שכבת אבק ולכלוך.'},
+          {crit:'בדוק ויזואלית שכל תעלות הכבלים נקיות מלכלוך וחלקי התקנה.', exp:'כל התעלות בגג נקיות לחלוטין מלכלוך ושאריות התקנה.'},
+        ]
+      },
+      {
+        id:'a2-comm', title:'חיזוק מכאני – מערכת תקשורת והפעלת הנייטור', items:[
+          {crit:'בדוק חיבורי התקשורת בין הממירים ליחידת התקשורת על פי התכנון.', exp:'חיבורי התקשורת על פי התכנון.'},
+          {crit:'בדוק המצאות כרטיסי תקשורת בכל הממירים.', exp:'בכל הממירים קיימים כרטיסי תקשורת.'},
+          {crit:'בדוק המצאות יחידת התקשורת המרכזית ונקודת רשת/ראוטר באזור התקשורת.', exp:'יחידת התקשורת ונקודות הרשת/ראוטר קיימות באזור התקשורת.'},
+        ]
+      },
+    ]
+  },
+  {
+    part: 'ב. בדיקות חשמליות',
+    note: 'הבדיקות החשמליות יבוצעו במכשירי מדידה שעברו כיול במעבדה מוסמכת בשנה האחרונה. טווח הסטייה של מכשירי המדידה לא יעלה על 2%.',
+    sections: [
+      {
+        id:'b1-earth', title:'צד DC – בדיקות הארקה (רציפות)', items:[
+          {crit:'רציפות הארקה לפנלים: בצע בדיקת רציפות חשמלית במד רציפות בין נקודת החיבור הראשית של ההארקה לקונסטרוקציה לבין נקודת החיבור של גישור ההארקה למסגרת הפנל.', exp:'חיווי רציפות מלאה במכשיר המדידה.'},
+          {crit:'רציפות הארקת התעלות: בצע בדיקת רציפות חשמלית במד רציפות ובחוט מאריך בין נקודת החיבור הראשית של ההארקה לתעלה לבין קטעי התעלה ולמכסים.', exp:'חיווי רציפות מלאה במכשיר המדידה.'},
+          {crit:'רציפות הארקת הממירים: בצע בדיקת רציפות חשמלית במד רציפות ובחוט מאריך בין נקודת החיבור הראשית של ההארקה לגוף הממיר לבין פס ההשוואה בלוח הממירים.', exp:'חיווי רציפות מלאה במכשיר המדידה.'},
+          {crit:'רציפות הארקה בין פס ההשוואה הראשי לקונסטרוקציה: בצע בדיקת רציפות חשמלית במד רציפות ובחוט מאריך בין פס ההשוואה הראשי לבין נקודות החיבור בפרטי הקונסטרוקציה.', exp:'חיווי רציפות מלאה במכשיר המדידה.'},
+        ]
+      },
+      {
+        id:'b1-iso', title:'צד DC – בדיקת בידוד מוליכים', items:[
+          {crit:'בצע בדיקת בידוד מוליכי DC במכשיר בודק בידוד במתח 1000V. הבדיקה תתבצע בלוח הסטרינגים כאשר כל המפסקים מנותקים והקו הנמדד אינו מחושמל. יש לבצע מדידה בין: פלוס והארקה, מינוס והארקה, ובין הפלוס והמינוס. אין לקבל תוצאה נמוכה מ-100MΩ.', exp:'תוצאה גבוהה מ-100MΩ.'},
+        ]
+      },
+      {
+        id:'b1-voc', title:'צד DC – מדידת מתח סטרינג בריקם', items:[
+          {crit:'בצע מדידת מתח DC לכל סטרינג כאשר כל המפסקים מנותקים והממיר מנותק. המדידה מבוצעת בכניסה להדקי המפסק. התוצאה צריכה להיות מקורבת למספר הפנלים בטור כפול מתח הריקם של פנל בודד (תלוי בתנאי הסביבה בזמן המדידה).', exp:'עפ״י תחום המתחים שיוגדר בתכנון המתקן; יוגדר במסמך בדיקות ספציפי.'},
+        ]
+      },
+      {
+        id:'b1-pol', title:'צד DC – בדיקת קוטביות לסטרינג', items:[
+          {crit:'בדוק את קוטביות הסטרינגים (פלוס/מינוס) בכל סטרינג.', exp:'קוטביות תקינה בכל הסטרינגים.'},
+        ]
+      },
+      {
+        id:'b1-isc', title:'צד DC – מדידת זרם קצר לסטרינג', items:[
+          {crit:'בצע מדידת זרם קצר (Isc) לכל סטרינג.', exp:'זרם קצר תקין ותואם למפרט הפנלים ולתנאי הסביבה.'},
+        ]
+      },
+      {
+        id:'b2-earth', title:'צד AC – הארקות', items:[
+          {crit:'בדיקת הארקה בלוח מונה: בצע בדיקה ב-LOOP-TESTER בין המפסק הראשי ובין פס ההשוואה הראשי; וודא שערך ההתנגדות המתקבל מתאים לגודל החיבור.', exp:'ערך ההתנגדות שווה או נמוך מהערך הרצוי לפי גודל הזרם במפסק הראשי.'},
+        ]
+      },
+      {
+        id:'b2-iso', title:'צד AC – בדיקת בידוד', items:[
+          {crit:'בצע בדיקת בידוד מוליכי AC במכשיר בודק בידוד במתח 500V. הבדיקה תתבצע בכל קווי החשמל במתח נמוך בין הפאזות לאדמה ובין האפס לאדמה. אין לקבל תוצאה נמוכה מ-3MΩ.', exp:'תוצאה גבוהה מ-3MΩ.'},
+        ]
+      },
+      {
+        id:'b2-switch', title:'צד AC – בדיקות ניתוק-חיבור מתקני חשמל', items:[
+          {crit:'בצע בדיקת הפעלה למפסקים ובדוק הפעלה נכונה בכל מצבי המפסק.', exp:'פעולת חיבור וניתוק תקינה.'},
+          {crit:'הפעל את מצב הבדיקה של כל מפסק ע״י לחיצה על לחצן TRIP ובדוק ניתוק והחזרה לפעולה.', exp:'פעולת חיבור וניתוק תקינה.'},
+        ]
+      },
+      {
+        id:'b2-meteo', title:'צד AC – בדיקת חיישנים במערכת מטאורולוגית', items:[
+          {crit:'בדוק תקינות התקנת החיישנים על פי הגדרות היצרן.', exp:'החיישנים מותקנים על פי הגדרות היצרן.'},
+        ]
+      },
+    ]
+  }
+];
+
+const partsContainer = document.getElementById('parts-container');
+let totalItems = 0;
+const itemPhotos = {}; // itemId -> [dataURL, ...]
+
+// כיווץ תמונה לפני שמירה (מקטין נפח לשליחה: עד 1280px, JPEG)
+function compressImage(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1280;
+        let w = img.width, h = img.height;
+        if(w > MAX || h > MAX){ const s = MAX / Math.max(w, h); w = Math.round(w*s); h = Math.round(h*s); }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = r.result;
+    };
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function renderThumbs(itemId, el){
+  const arr = itemPhotos[itemId] || [];
+  el.innerHTML = arr.map((d,i) =>
+    `<div class="photo-thumb"><img src="${d}" alt="תמונה ${i+1}"><button type="button" data-i="${i}" title="הסר תמונה">✕</button></div>`
+  ).join('');
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    arr.splice(+b.dataset.i, 1);
+    renderThumbs(itemId, el);
+  }));
+}
+
+PARTS.forEach(part => {
+  const ph = document.createElement('div');
+  ph.className = 'part-header';
+  ph.textContent = part.part;
+  partsContainer.appendChild(ph);
+  if(part.note){
+    const pn = document.createElement('div');
+    pn.className = 'part-note';
+    pn.textContent = part.note;
+    partsContainer.appendChild(pn);
+  }
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  part.sections.forEach((section, sIdx) => {
+    totalItems += section.items.length;
+    const sectionEl = document.createElement('div');
+    sectionEl.className = 'section';
+    sectionEl.dataset.sectionId = section.id;
+
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `<div class="section-title"><span class="chevron"></span>${section.title}</div>
+      <div class="section-count" data-count="${section.id}">0/${section.items.length}</div>`;
+    head.addEventListener('click', () => sectionEl.classList.toggle('open'));
+
+    const body = document.createElement('div');
+    body.className = 'section-body';
+
+    section.items.forEach((it, iIdx) => {
+      const itemId = `${section.id}-${iIdx}`;
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.dataset.itemId = itemId;
+      item.dataset.status = '';
+      const expHtml = it.exp ? `<div class="item-exp"><b>תוצאה צפויה:</b> ${it.exp}</div>` : '';
+      item.innerHTML = `
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${iIdx + 1}.</span>${it.crit}</div>
+          <div class="status-group">
+            <button class="status-btn ok" data-status="ok" title="עבר">עבר</button>
+            <button class="status-btn bad" data-status="bad" title="נכשל">נכשל</button>
+            <button class="status-btn na" data-status="na" title="לא רלוונטי">לא רלוונטי</button>
+          </div>
+        </div>
+        ${expHtml}
+        <div class="item-note"><label>תוצאה מדודה / הערה</label>
+          <div class="note-row">
+            <input type="text" placeholder="ערך שנמדד או הערה (אופציונלי)">
+            <button type="button" class="photo-btn" title="צלם / צרף תמונה">📷</button>
+            <input type="file" class="photo-input" accept="image/*" capture="environment" multiple style="display:none">
+          </div>
+          <div class="photo-thumbs"></div>
+        </div>
+      `;
+      item.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const status = btn.dataset.status;
+          const current = item.dataset.status;
+          item.dataset.status = current === status ? '' : status;
+          item.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.dataset.status === item.dataset.status));
+          updateProgress();
+        });
+      });
+      // צילום/צירוף תמונות לסעיף
+      const photoBtn = item.querySelector('.photo-btn');
+      const photoInput = item.querySelector('.photo-input');
+      const thumbsEl = item.querySelector('.photo-thumbs');
+      photoBtn.addEventListener('click', () => photoInput.click());
+      photoInput.addEventListener('change', async () => {
+        const files = [...photoInput.files];
+        photoInput.value = '';
+        for(const f of files){
+          try {
+            const dataUrl = await compressImage(f);
+            if(!itemPhotos[itemId]) itemPhotos[itemId] = [];
+            itemPhotos[itemId].push(dataUrl);
+          } catch(e){ showToast('שגיאה בטעינת התמונה'); }
+        }
+        renderThumbs(itemId, thumbsEl);
+      });
+      body.appendChild(item);
+    });
+
+    sectionEl.appendChild(head);
+    sectionEl.appendChild(body);
+    card.appendChild(sectionEl);
+  });
+
+  partsContainer.appendChild(card);
+});
+
+// ריכוז - טוגלים
+const toggleState = {};
+document.querySelectorAll('.toggle-row').forEach(row => {
+  const key = row.dataset.toggle;
+  row.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.val;
+      if(toggleState[key] === val){
+        toggleState[key] = null;
+        btn.classList.remove('active');
+      } else {
+        toggleState[key] = val;
+        row.querySelectorAll('.toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.val === val));
+      }
+    });
+  });
+});
+
+// ===== מיקום Waze =====
+let savedLocation = null; // {lat, lon, wazeUrl}
+const locBtn = document.getElementById('btn-location');
+const locResult = document.getElementById('loc-result');
+
+// קורא תג מיקום GPS מתוך קובץ JPEG (EXIF) - עוקף לגמרי את חסימת מיקום הדפדפן בקבצים מקומיים,
+// כי כאן אנחנו רק קוראים בייטים מקובץ (File API), לא קוראים ל-navigator.geolocation.
+function getExifGPS(buffer) {
+  const view = new DataView(buffer);
+  if (view.getUint16(0, false) !== 0xFFD8) return null; // לא JPEG
+  let offset = 2;
+  const length = view.byteLength;
+  while (offset < length - 1) {
+    const marker = view.getUint16(offset, false);
+    if ((marker & 0xFF00) !== 0xFF00) break;
+    if (marker === 0xFFD8) { offset += 2; continue; }
+    if (marker === 0xFFD9 || marker === 0xFFDA) break;
+    const size = view.getUint16(offset + 2, false);
+    if (marker !== 0xFFE1) { offset += 2 + size; continue; }
+    const exifStart = offset + 4;
+    if (view.getUint32(exifStart, false) !== 0x45786966) { offset += 2 + size; continue; }
+    const tiffOffset = exifStart + 6;
+    const little = view.getUint16(tiffOffset, false) === 0x4949;
+    const firstIFDOffset = view.getUint32(tiffOffset + 4, little);
+    const ifd0Offset = tiffOffset + firstIFDOffset;
+    const entries = view.getUint16(ifd0Offset, little);
+    let gpsIFDOffset = null;
+    for (let i = 0; i < entries; i++) {
+      const entryOffset = ifd0Offset + 2 + i * 12;
+      if (view.getUint16(entryOffset, little) === 0x8825) {
+        gpsIFDOffset = tiffOffset + view.getUint32(entryOffset + 8, little);
+        break;
+      }
+    }
+    if (gpsIFDOffset === null) return null;
+    const gEntries = view.getUint16(gpsIFDOffset, little);
+    let latRef, lonRef, lat, lon;
+    const readRational = off => { const n = view.getUint32(off, little), d = view.getUint32(off+4, little); return d ? n/d : 0; };
+    const readCoord = entryOffset => {
+      const abs = tiffOffset + view.getUint32(entryOffset + 8, little);
+      return readRational(abs) + readRational(abs+8)/60 + readRational(abs+16)/3600;
+    };
+    for (let i = 0; i < gEntries; i++) {
+      const entryOffset = gpsIFDOffset + 2 + i * 12;
+      const tag = view.getUint16(entryOffset, little);
+      if (tag === 1) latRef = String.fromCharCode(view.getUint8(entryOffset + 8));
+      else if (tag === 2) lat = readCoord(entryOffset);
+      else if (tag === 3) lonRef = String.fromCharCode(view.getUint8(entryOffset + 8));
+      else if (tag === 4) lon = readCoord(entryOffset);
+    }
+    if (lat === undefined || lon === undefined) return null;
+    if (latRef === 'S') lat = -lat;
+    if (lonRef === 'W') lon = -lon;
+    return { lat, lon };
+  }
+  return null;
+}
+
+function showSavedLocation(lat, lon, sourceLabel){
+  const wazeUrl = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
+  savedLocation = { lat, lon, wazeUrl };
+  locResult.innerHTML =
+    `<div class="coords">מיקום נשמר${sourceLabel ? ' (' + sourceLabel + ')' : ''}: ${(+lat).toFixed(6)}, ${(+lon).toFixed(6)}</div>` +
+    `<a href="${wazeUrl}" target="_blank" rel="noopener">🧭 פתח ניווט ב-Waze</a>` +
+    `<div class="loc-url-row">` +
+      `<input type="text" id="waze-url-box" readonly value="${wazeUrl}">` +
+      `<button type="button" id="waze-url-copy" title="העתק קישור">📋</button>` +
+    `</div>`;
+  document.getElementById('waze-url-copy').addEventListener('click', () => copyText(wazeUrl, 'הקישור הועתק'));
+  document.getElementById('waze-url-box').addEventListener('click', function(){ this.select(); });
+}
+
+const photoLocBtn = document.getElementById('btn-location-photo');
+const photoLocInput = document.getElementById('loc-photo-input');
+photoLocBtn.addEventListener('click', () => photoLocInput.click());
+photoLocInput.addEventListener('change', () => {
+  const file = photoLocInput.files[0];
+  photoLocInput.value = '';
+  if(!file) return;
+  photoLocBtn.textContent = '⌛ קורא מיקום מהתמונה...';
+  const reader = new FileReader();
+  reader.onload = () => {
+    const gps = getExifGPS(reader.result);
+    photoLocBtn.textContent = '📷 צלם תמונה של מיקום הפרויקט (חובה)';
+    if(gps){
+      showSavedLocation(gps.lat, gps.lon, 'מתמונה');
+      photoLocBtn.classList.add('captured');
+      showToast('מיקום נקרא מהתמונה בהצלחה');
+    } else {
+      locResult.innerHTML = '<div class="err">לא נמצא תג מיקום בתמונה. ודא ששירותי המיקום פעילים באפליקציית המצלמה (הגדרות מצלמה ← מיקום), ונסה שוב. לחלופין השתמש באפשרויות למטה.</div>';
+    }
+  };
+  reader.onerror = () => {
+    photoLocBtn.textContent = '📷 צלם תמונה של מיקום הפרויקט (חובה)';
+    showToast('שגיאה בקריאת התמונה');
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+document.getElementById('btn-location-manual-toggle').addEventListener('click', () => {
+  const box = document.getElementById('loc-manual-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+});
+locBtn.addEventListener('click', () => {
+  if(!navigator.geolocation){
+    locResult.innerHTML = '<div class="err">הדפדפן אינו תומך באיתור מיקום.</div>';
+    return;
+  }
+  locBtn.textContent = '⌛ מאתר מיקום...';
+  navigator.geolocation.getCurrentPosition(pos => {
+    locBtn.textContent = 'נסה איתור מיקום אוטומטי של הדפדפן';
+    showSavedLocation(pos.coords.latitude.toFixed(6), pos.coords.longitude.toFixed(6), 'GPS דפדפן');
+    showToast('מיקום נשמר');
+  }, err => {
+    locBtn.textContent = 'נסה איתור מיקום אוטומטי של הדפדפן';
+    let msg = 'לא ניתן היה לאתר מיקום אוטומטית (מקובל בקבצים מקומיים) - השתמש בצילום תמונה למעלה, או בהדבקה ידנית.';
+    if(err.code === 3) msg = 'איתור המיקום ארך זמן רב מדי - נסה שוב.';
+    locResult.innerHTML = `<div class="err">${msg}</div>`;
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+});
+
+// שמירת מיקום ידנית - הדבקת קישור/קואורדינטות שהועתקו מהאפליקציה (עוקף מגבלת מיקום בקבצים מקומיים)
+document.getElementById('loc-manual-save').addEventListener('click', () => {
+  const raw = document.getElementById('loc-manual-input').value.trim();
+  if(!raw){ showToast('הדבק קודם קישור או קואורדינטות'); return; }
+  const coordMatch = raw.match(/(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+  let lat, lon;
+  if(coordMatch){
+    lat = coordMatch[1]; lon = coordMatch[2];
+  } else {
+    lat = ''; lon = '';
+  }
+  const wazeUrl = (coordMatch && !/waze\.com|google\.com|maps/i.test(raw))
+    ? `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`
+    : raw;
+  if(coordMatch){
+    showSavedLocation(lat, lon, 'ידני');
+  } else {
+    savedLocation = { lat: '', lon: '', wazeUrl };
+    locResult.innerHTML =
+      `<div class="coords">מיקום נשמר (ידני)</div>` +
+      `<a href="${wazeUrl}" target="_blank" rel="noopener">🧭 פתח ניווט ב-Waze</a>` +
+      `<div class="loc-url-row">` +
+        `<input type="text" id="waze-url-box" readonly value="${wazeUrl}">` +
+        `<button type="button" id="waze-url-copy" title="העתק קישור">📋</button>` +
+      `</div>`;
+    document.getElementById('waze-url-copy').addEventListener('click', () => copyText(wazeUrl, 'הקישור הועתק'));
+    document.getElementById('waze-url-box').addEventListener('click', function(){ this.select(); });
+  }
+  photoLocBtn.classList.add('captured');
+  document.getElementById('loc-manual-input').value = '';
+  showToast('המיקום נשמר');
+});
+
+function updateProgress(){
+  let ok=0, bad=0, na=0;
+  PARTS.forEach(part => part.sections.forEach(section => {
+    let sectionDone = 0;
+    section.items.forEach((_, iIdx) => {
+      const item = document.querySelector(`.item[data-item-id="${section.id}-${iIdx}"]`);
+      const st = item.dataset.status;
+      if(st === 'ok') ok++;
+      if(st === 'bad') bad++;
+      if(st === 'na') na++;
+      if(st) sectionDone++;
+    });
+    const countEl = document.querySelector(`.section-count[data-count="${section.id}"]`);
+    countEl.textContent = `${sectionDone}/${section.items.length}`;
+    countEl.classList.toggle('complete', sectionDone === section.items.length);
+  }));
+  const done = ok+bad+na;
+  document.getElementById('progress-label').textContent = `${done} מתוך ${totalItems} סעיפים נבדקו`;
+  document.getElementById('fill-ok').style.width = (((ok+na)/totalItems)*100) + '%';
+  document.getElementById('fill-bad').style.width = ((bad/totalItems)*100) + '%';
+  const badgeEl = document.getElementById('badge-issues');
+  document.getElementById('issues-count').textContent = bad;
+  badgeEl.classList.toggle('show', bad > 0);
+}
+updateProgress();
+
+document.querySelectorAll('.verdict-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.verdict-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if(!confirm('לאפס את כל הבדיקה? כל הנתונים שהוזנו יימחקו.')) return;
+  document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+  document.querySelectorAll('.item').forEach(item => {
+    item.dataset.status = '';
+    item.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  });
+  Object.keys(itemPhotos).forEach(k => delete itemPhotos[k]);
+  document.querySelectorAll('.photo-thumbs').forEach(e => e.innerHTML = '');
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  Object.keys(toggleState).forEach(k => toggleState[k] = null);
+  document.querySelectorAll('.verdict-btn').forEach(b => b.classList.remove('active'));
+  savedLocation = null;
+  locResult.innerHTML = '';
+  locBtn.textContent = '📍 שמירת מיקום ל-Waze';
+  locBtn.classList.remove('captured');
+  updateProgress();
+  showToast('הטופס אופס');
+});
+
+function buildSummaryText(){
+  const statusLabel = {ok:'עבר ✔', bad:'נכשל ✖', na:'לא רלוונטי –', '':'לא נבדק'};
+  let lines = [];
+  lines.push('נוהל בדיקות Off Grid - טופס בדיקות למערכת PV | מאורות - כל האנרגיה בשבילך');
+  lines.push('==============================================');
+  lines.push(`שם ומספר הפרוייקט: ${document.getElementById('gen-project').value || '-'}`);
+  lines.push(`תאריך הבדיקה: ${document.getElementById('gen-date').value || '-'}`);
+  lines.push(`מנהל הבדיקה: ${document.getElementById('gen-manager').value || '-'}`);
+  lines.push(`הקבלן המבצע: ${document.getElementById('gen-contractor').value || '-'}`);
+  lines.push(`מיקום (Waze): ${savedLocation ? savedLocation.wazeUrl : '-'}`);
+  lines.push('');
+  lines.push('ריכוז בדיקות (OFF-GRID):');
+  lines.push(`  תוכניות סטרינגים: ${toggleState['strings'] || '-'}`);
+  lines.push(`  צילום רחפן גובה 30 מטר: ${toggleState['drone'] || '-'}`);
+  lines.push(`  תקשורת אינטרנט: ${toggleState['internet'] || '-'}`);
+  lines.push(`  סוג התקשורת: ${toggleState['commtype'] || '-'}`);
+  lines.push('');
+
+  PARTS.forEach(part => {
+    lines.push('### ' + part.part);
+    part.sections.forEach(section => {
+      lines.push('— ' + section.title);
+      section.items.forEach((it, iIdx) => {
+        const item = document.querySelector(`.item[data-item-id="${section.id}-${iIdx}"]`);
+        const note = item.querySelector('.item-note input').value;
+        let line = `  [${statusLabel[item.dataset.status]}] ${it.crit}`;
+        if(note) line += ` | תוצאה מדודה: ${note}`;
+        const nPhotos = (itemPhotos[`${section.id}-${iIdx}`] || []).length;
+        if(nPhotos) line += ` | תמונות מצורפות: ${nPhotos}`;
+        lines.push(line);
+      });
+    });
+    lines.push('');
+  });
+
+  lines.push('סיכום ומסקנות');
+  lines.push(`הערות כלליות: ${document.getElementById('summary-notes').value || '-'}`);
+  const verdictBtn = document.querySelector('.verdict-btn.active');
+  lines.push(`מסקנה: ${verdictBtn ? verdictBtn.textContent.trim() : 'לא נקבע'}`);
+  lines.push(`נבדק ע"י: ${document.getElementById('signoff-name').value || '-'}   תאריך: ${document.getElementById('signoff-date').value || '-'}`);
+  return lines.join('\n');
+}
+
+function copyText(text, okMsg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => { if(okMsg) showToast(okMsg); }).catch(() => fallbackCopy(text, okMsg));
+  } else { fallbackCopy(text, okMsg); }
+}
+
+document.getElementById('btn-copy').addEventListener('click', () => {
+  copyText(buildSummaryText(), 'הסיכום הועתק ללוח');
+});
+
+// שליחת הדוח למיילים הקבועים
+// כתובות הנמענים - לתצוגה ולגיבוי הידני. השליחה האוטומטית נשלטת ע"י הזרימה ב-Power Automate.
+const REPORT_RECIPIENTS = ['pv@menergy.co.il'];
+const LOGO_SVG = '<svg width="54" height="54" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+  '<path d="M96 30 A46 46 0 1 0 104 66" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>' +
+  '<path d="M86 34 A36 36 0 1 0 94 58" stroke="#f7a81e" stroke-width="10" stroke-linecap="round"/>' +
+  '<path d="M70 54 L104 22" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round"/>' +
+  '<path d="M88 20 L106 20 L106 38" stroke="#2f6fb0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+  '<path d="M42 74 L54 60 L64 68 L82 44" stroke="#1f9ed6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+  '<path d="M42 82 L74 82" stroke="#f7a81e" stroke-width="7" stroke-linecap="round"/></svg>';
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// בונה מסמך דוח מעוצב (HTML) להמרה ל-PDF
+function buildReportElement(){
+  const statusLabel = {ok:'עבר', bad:'נכשל', na:'לא רלוונטי', '':'—'};
+  const statusColor = {ok:'#1f8a4c', bad:'#c23b3b', na:'#8a8f98', '':'#b3bcc4'};
+  const g = id => esc(document.getElementById(id).value) || '—';
+  const verdictBtn = document.querySelector('.verdict-btn.active');
+  const verdict = verdictBtn ? verdictBtn.textContent.trim() : 'לא נקבע';
+
+  const el = document.createElement('div');
+  el.style.cssText = 'direction:rtl;font-family:Rubik,Arial,sans-serif;color:#1c2a33;background:#fff;width:770px;padding:26px 26px 30px;box-sizing:border-box;';
+
+  let h = '';
+  h += '<div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #f7a81e;padding-bottom:12px;margin-bottom:16px;">' +
+       LOGO_SVG +
+       '<div style="line-height:1.1;"><div style="font-size:28px;font-weight:900;color:#1f9ed6;">מאורות</div>' +
+       '<div style="font-size:12px;font-weight:500;color:#45bfe8;">כל האנרגיה בשבילך</div></div>' +
+       '<div style="margin-right:auto;text-align:left;font-size:13px;font-weight:700;color:#157fb8;line-height:1.4;">נוהל בדיקות Off Grid<br>טופס בדיקות למערכת PV</div></div>';
+
+  // פרטי פרויקט
+  h += '<table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px;">' +
+       '<tr><td style="padding:4px 6px;background:#e7f4fb;font-weight:700;width:130px;">שם ומספר הפרוייקט</td><td style="padding:4px 6px;">'+g('gen-project')+'</td>' +
+       '<td style="padding:4px 6px;background:#e7f4fb;font-weight:700;width:110px;">תאריך הבדיקה</td><td style="padding:4px 6px;">'+g('gen-date')+'</td></tr>' +
+       '<tr><td style="padding:4px 6px;background:#e7f4fb;font-weight:700;">מנהל הבדיקה</td><td style="padding:4px 6px;">'+g('gen-manager')+'</td>' +
+       '<td style="padding:4px 6px;background:#e7f4fb;font-weight:700;">הקבלן המבצע</td><td style="padding:4px 6px;">'+g('gen-contractor')+'</td></tr>' +
+       '<tr><td style="padding:4px 6px;background:#e7f4fb;font-weight:700;">מיקום (Waze)</td><td style="padding:4px 6px;" colspan="3">'+(savedLocation?esc(savedLocation.wazeUrl):'—')+'</td></tr>' +
+       '</table>';
+
+  // ריכוז
+  h += '<div style="font-size:12.5px;margin-bottom:14px;background:#f2f7fb;border-radius:6px;padding:8px 10px;">' +
+       '<b style="color:#157fb8;">ריכוז בדיקות:</b> ' +
+       'תוכניות סטרינגים: '+(toggleState['strings']||'—')+' &nbsp;|&nbsp; ' +
+       'צילום רחפן 30מ׳: '+(toggleState['drone']||'—')+' &nbsp;|&nbsp; ' +
+       'תקשורת אינטרנט: '+(toggleState['internet']||'—')+' &nbsp;|&nbsp; ' +
+       'סוג תקשורת: '+(toggleState['commtype']||'—')+'</div>';
+
+  // סעיפים
+  PARTS.forEach(part => {
+    h += '<div style="font-size:15px;font-weight:700;color:#157fb8;border-right:4px solid #f7a81e;padding:4px 8px;margin:14px 0 6px;">'+esc(part.part)+'</div>';
+    part.sections.forEach(section => {
+      h += '<div style="font-size:13px;font-weight:700;background:#eaf5fc;padding:4px 8px;margin-top:8px;">'+esc(section.title)+'</div>';
+      h += '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      section.items.forEach((it,iIdx) => {
+        const item = document.querySelector('.item[data-item-id="'+section.id+'-'+iIdx+'"]');
+        const st = item.dataset.status;
+        const note = esc(item.querySelector('.item-note input').value);
+        const photos = itemPhotos[section.id+'-'+iIdx] || [];
+        const photosHtml = photos.length
+          ? '<div style="margin-top:5px;">' + photos.map(d =>
+              '<img src="'+d+'" style="width:175px;max-width:100%;border-radius:6px;border:1px solid #dfe8ef;margin:3px 0 3px 6px;vertical-align:top;">'
+            ).join('') + '</div>'
+          : '';
+        h += '<tr style="border-bottom:1px solid #eee;">' +
+             '<td style="padding:4px 6px;vertical-align:top;">'+esc(it.crit)+
+             (note?'<div style="color:#557;font-size:10.5px;margin-top:2px;">תוצאה מדודה: '+note+'</div>':'')+
+             photosHtml+'</td>' +
+             '<td style="padding:4px 6px;text-align:center;width:74px;vertical-align:top;font-weight:700;color:'+statusColor[st]+';white-space:nowrap;">'+statusLabel[st]+'</td></tr>';
+      });
+      h += '</table>';
+    });
+  });
+
+  // סיכום
+  h += '<div style="margin-top:16px;border-top:2px solid #dfe8ef;padding-top:10px;font-size:12.5px;">' +
+       '<div style="font-size:14px;font-weight:700;color:#157fb8;margin-bottom:6px;">סיכום ומסקנות</div>' +
+       '<div style="margin-bottom:6px;"><b>הערות כלליות:</b> '+g('summary-notes')+'</div>' +
+       '<div style="margin-bottom:6px;"><b>מסקנה:</b> '+esc(verdict)+'</div>' +
+       '<div style="display:flex;gap:30px;margin-top:8px;"><div><b>שם וחתימת הבודק:</b> '+g('signoff-name')+'</div>' +
+       '<div><b>תאריך:</b> '+g('signoff-date')+'</div></div></div>';
+
+  el.innerHTML = h;
+  return el;
+}
+
+// ====== הגדרת שליחה אוטומטית ======
+// הדבק כאן את כתובת ה-Webhook מ-Power Automate (טריגר "When a HTTP request is received").
+// כל עוד הערך ריק - הטופס יחזור לשליחה ידנית (העתקת דוח + פתיחת מייל).
+const WEBHOOK_URL = 'https://default9ba4263adca04fee98142848345ecd.30.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/06/workflows/e4c4f37ea7eb4e6d9a63c2ffb49b56ce/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OGhLpvnqff-MqA-ll488mhHe9cqCOCLJHRjh1GRCitY';
+
+// בונה מסמך HTML עצמאי מלא של הדוח (לשליחה לשרת שיהפוך אותו ל-PDF)
+function buildReportHTML(){
+  const el = buildReportElement();
+  return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">' +
+    '<style>body{margin:0;} *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}</style>' +
+    '</head><body>' + el.outerHTML + '</body></html>';
+}
+
+// שליחה ידנית (גיבוי): העתקת הדוח + פתיחת מייל קצר לשלושת הנמענים
+function manualSendFallback(subject, project){
+  copyText(buildSummaryText(), null);
+  const body =
+    'שלום,\n\nמצורף דוח בדיקות Off Grid (' + project + ').\n\n' +
+    '======================================\n' +
+    'הדוח המלא הועתק ללוח.\n' +
+    'יש להדביק אותו כאן בגוף ההודעה (הדבקה / Ctrl+V) לפני השליחה.\n' +
+    '======================================';
+  const mailto = 'mailto:' + REPORT_RECIPIENTS.join(',') +
+    '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  const m = document.createElement('a'); m.href = mailto;
+  document.body.appendChild(m); m.click(); setTimeout(()=>m.remove(),100);
+  showToast('הדוח הועתק ללוח ונפתח מייל — הדבק אותו בגוף ההודעה');
+}
+
+document.getElementById('btn-send-email').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-send-email');
+
+  // חובה: לא ניתן לשלוח דוח ללא תמונת מיקום הפרויקט
+  if(!savedLocation){
+    showToast('יש לצלם את מיקום הפרויקט לפני שליחת הדוח');
+    const locBlock = document.querySelector('.loc-block');
+    if(locBlock) locBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    photoLocBtn.classList.add('needs-attention');
+    setTimeout(() => photoLocBtn.classList.remove('needs-attention'), 1600);
+    return;
+  }
+
+  const project = document.getElementById('gen-project').value || 'ללא שם';
+  const date = document.getElementById('gen-date').value || '';
+  const subject = 'דוח בדיקות Off Grid - ' + project + (date ? ' - ' + date : '');
+  const filename = 'דוח בדיקות Off Grid - ' + project + '.pdf';
+
+  // ללא Webhook מוגדר: שליחה ידנית
+  if(!WEBHOOK_URL){
+    manualSendFallback(subject, project);
+    return;
+  }
+
+  // עם Webhook: שליחה אוטומטית מלאה דרך Power Automate
+  const orig = btn.textContent;
+  btn.textContent = '⌛ שולח דוח...'; btn.disabled = true;
+  try {
+    const payload = {
+      subject: subject,
+      filename: filename,
+      recipients: REPORT_RECIPIENTS.join(';'),
+      project: project,
+      date: date,
+      html: buildReportHTML()
+    };
+    // mode:no-cors + text/plain: מונע preflight ו-CORS מול Power Automate.
+    // התגובה "אטומה" ולא ניתנת לקריאה - לכן אם אין שגיאת רשת מניחים שהשליחה הצליחה.
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(payload)
+    });
+    showToast('✔ הדוח נשלח לשלושת הנמענים');
+  } catch(e){
+    // שגיאת רשת אמיתית (אין אינטרנט / כתובת שגויה) - גיבוי ידני
+    showToast('שליחה אוטומטית נכשלה — עוברים לשליחה ידנית');
+    manualSendFallback(subject, project);
+  } finally {
+    btn.textContent = orig; btn.disabled = false;
+  }
+});
+
+function fallbackCopy(text, okMsg){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); if(okMsg) showToast(okMsg); }
+  catch(e){ showToast('שגיאה בהעתקה'); }
+  document.body.removeChild(ta);
+}
+</script>
+
+</body>
+</html>
