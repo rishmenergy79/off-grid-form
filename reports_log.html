@@ -269,6 +269,12 @@ document.getElementById('confirm-yes').addEventListener('click', async () => {
 });
 
 loadReports();
+
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
