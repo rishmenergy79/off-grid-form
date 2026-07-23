@@ -256,7 +256,7 @@ document.getElementById('confirm-yes').addEventListener('click', async () => {
   let failCount = 0;
   for(const r of idsToDelete){
     try {
-      const url = DELETE_WEBHOOK_URL + '?id=' + encodeURIComponent(r.id) + '&fileId=' + encodeURIComponent(r.fileId || '');
+      const url = DELETE_WEBHOOK_URL + '&id=' + encodeURIComponent(r.id) + '&fileId=' + encodeURIComponent(r.fileId || '');
       const res = await fetch(url, { method: 'GET' });
       if(!res.ok) throw new Error('status ' + res.status);
     } catch(e){
