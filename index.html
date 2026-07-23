@@ -1254,6 +1254,14 @@ function fallbackCopy(text, okMsg){
   catch(e){ showToast('שגיאה בהעתקה'); }
   document.body.removeChild(ta);
 }
+
+// ===== רישום Service Worker - נדרש כדי שהתקנה למסך הבית תראה את האייקון האמיתי =====
+// ותפתח במסך מלא (בלי תג דפדפן). עובד רק בכתובת https אמיתית.
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 
 </body>
